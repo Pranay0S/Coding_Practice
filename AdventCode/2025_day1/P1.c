@@ -1,3 +1,17 @@
+/*
+    Day 1 Advent of Code Challenge
+    Author: Pranay Srivastava
+    Date: 1/20/2026
+    Purpose:
+        Using prior knowledge on C concepts, develop a program to read a list of commands
+        and provide the amount of times a '0' is the final number after rotations. A "dial"
+        that has wrapping from 0-99 backwards and forwards is the conceptual object we are 
+        attempting to unlock.
+
+    Version: 1.0.0
+*/
+
+// --- Libraries/Definitions/Global Variables ---
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,6 +21,15 @@
 static int zero_Count = 0;
 static int position = 0;
 
+
+// -- Functions ---
+
+/*
+    read_file_line(): 
+    -   Produces a 0 resulting from a proper read file under name of input parameter.
+    -   Reads the file line by line.
+    -   Performs wrapping of position on "dial" and count for occurrences of zero.
+*/
 int read_file_line(const char* filename){
     FILE* file_ptr;
     char line_buffer[MAX_LINE_LENGTH];      // Buffer to hold each line read from file
@@ -58,16 +81,19 @@ int read_file_line(const char* filename){
     return 0;
 }
 
+// - Driver Function -
 int main(){
     // Start position is set to 50
     position = 50;
 
+    // Call file reader and print if error occurs
     if(read_file_line("day1_input.txt") != 0){
         fprintf(stderr, "File reading operation failure.\n");
         return EXIT_FAILURE;
     }
 
-    printf("\nSecurity Number: %d", zero_Count);
+    // Print Security Count for Answer
+    printf("\nSecurity Number: %d", zero_Count);    // My case : 1100
     
     // You can remove files using this function call
     //remove("day1_input.txt");
