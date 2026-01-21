@@ -4,41 +4,70 @@
     Date: 1/20/2026
     Purpose:
         Using prior knowledge on C concepts, develop a program to read a list of commands
-        and provide the amount of times a '0' is the final number after rotations. A "dial"
+        and provide the amount of times a '0' passed over or landed on after rotations. A "dial"
         that has wrapping from 0-99 backwards and forwards is the conceptual object we are 
         attempting to unlock.
 
-    Version: 1.0.0
+    Version: 1.2.9
 */
 
 // --- Libraries/Definitions/Global Variables ---
 #include <stdio.h>
 #include <stdlib.h>
+#include <ctype.h>
+#include <limits.h>
 
 #define MAX_LINE_LENGTH 16
 #define RANGE 100
 
-// -- Functions ---
-
-#include <ctype.h>
-#include <limits.h>
-
-static long long zero_Count = 0;
+static long long zero_Count = 0;    // Swap to prevent overflow from ints
 static int position = 0;
 
+// -- Functions ---
+
+/*
+    count_hits_zero():
+    -   Dial positions are 0-99, wrapping enabled, and can cross 0 multiple times
+    -   Using parameters of direction, current position, and difference returns 
+        number of times the dial points at 0 during this rotation.
+*/
 static long long count_hits_zero(int pos, char dir, int n) {
+    /*
+        Example Usage:
+        position = 20 = first
+        n = 350
+
+        first hit at 350 - 20 = 330
+        additional hits = 330/100 = 3
+
+        total = 1 + 3 = 4
+        return 4
+    */
+
+    // If dial moves 0 or less clicks, return a 0
     if (n <= 0) return 0;
 
     int first;
+    /* 
+       Determine how many steps it takes to hit 0 the first time starting at position
+       Right rotations reach 0 after (100 - pos) steps, a full loop = 100 steps from pos == 0
+       Left rotations reach 0 after pos steps, a full loop (100 steps) from pos == 0
+    */
+
+    // Right rotations
     if (dir == 'R') {
         first = (RANGE - pos) % RANGE;
         if (first == 0) first = RANGE;
-    } else { // 'L'
+    } 
+    // Left rotations
+    else {
         first = pos % RANGE;
         if (first == 0) first = RANGE;
     }
 
+    // If the total movement is smaller than the steps needed to reach the first 0, zero is never hit
     if (n < first) return 0;
+    // Otherwise: we hit 0 once and every additional hit is 100 steps for 0
     return 1LL + (long long)(n - first) / RANGE;
 }
 
@@ -64,25 +93,24 @@ int read_file_line(const char* filename){
 
     // Read the file line by line using fgets() -- which reads until it detects a newline character
     while (fgets(line_buffer, MAX_LINE_LENGTH, file_ptr) != NULL){
-        char dir;
-int val;
+        char dir; int val;
 
-if (sscanf(line_buffer, " %c%d", &dir, &val) != 2) {
-    fprintf(stderr, "Invalid line: %s\n", line_buffer);
-    continue;
-}
-dir = (char)toupper((unsigned char)dir);
-if (dir != 'L' && dir != 'R') {
-    fprintf(stderr, "Unknown direction: %c\n", dir);
-    continue;
-}
+        if (sscanf(line_buffer, " %c%d", &dir, &val) != 2) {
+            fprintf(stderr, "Invalid line: %s\n", line_buffer);
+            continue;
+        }
+        dir = (char)toupper((unsigned char)dir);
+        if (dir != 'L' && dir != 'R') {
+            fprintf(stderr, "Unknown direction: %c\n", dir);
+            continue;
+        }
 
-zero_Count += count_hits_zero(position, dir, val);
+        zero_Count += count_hits_zero(position, dir, val);
 
-// update final position after the whole rotation
-int delta = (dir == 'R') ? val : -val;
-int new_pos = position + delta;
-position = (new_pos % RANGE + RANGE) % RANGE;
+        // update final position after the whole rotation
+        int delta = (dir == 'R') ? val : -val;
+        int new_pos = position + delta;
+        position = (new_pos % RANGE + RANGE) % RANGE;
 
     }
 
