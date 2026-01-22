@@ -1,7 +1,7 @@
 /*
     Day 2 Advent of Code Challenge
     Author: Pranay Srivastava
-    Date: 1/2022026
+    Date: 1/20/2026
     Purpose:
         Input of various ranges separated by commas in a single line have to be read. The
         ranges have ID that are invalid if repeated numbers are detected. For example, 998-1012
